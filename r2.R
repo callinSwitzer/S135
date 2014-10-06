@@ -23,11 +23,13 @@ colors()[CL()]
 LS <- function(o)     # select two points randomly in the unit square
 {
     XY <- matrix(runif(4), ncol=2)
-    x11(width=5,height=5.5)    # keep old plot and open a new plotting window
-    plot(XY,xlim=0:1,ylim=0:1)
+    #x11(width=5,height=5.5)    # keep old plot and open a new plotting window
+    plot(XY,xlim=0:1,ylim=0:1, type = "b", col = CL(), lwd = 3)
     lines(XY,col=CL(),lwd=3)
     XY
 }
+
+
 
 LS()
 LS()
@@ -39,14 +41,14 @@ for (j in 1:50)
     LS() 
   }
 
-graphics.off()   # close all plots altogether
+#graphics.off()   # close all plots altogether
 
 rnd.dist <- function(m)
 {
   sapply(1:m, function(o)
            {
              XY <- matrix(runif(4), ncol=2)
-             D <- sqrt((XY[2,1]-XY[1,1])^2+(XY[2,2]-XY[1,2])^2)
+             D <- sqrt((XY[2,1]-XY[1,1])^2+(XY[2,2]-XY[1,2])^2) # compute length of each segment
              D
            })
 }
@@ -71,7 +73,7 @@ H$breaks
 H$counts
 H$density
 {
-  x11()
+  #x11()
   hist(DS, freq=FALSE, border="darkblue", plot=TRUE)
   pdf.l <- function(x) 4*x*(pi/2-2*x+x^2/2)
   pdf.r <- function(x) 4*x*(asin(1/x)-acos(1/x)+2*sqrt(x^2-1)-x^2/2-1)
@@ -79,13 +81,13 @@ H$density
   curve(pdf.r,from=1,to=sqrt(2),add=TRUE,col="red",lwd=2)
 }
 # the histogram is close to the theoretical density function
-graphics.off()   # close plot
+#graphics.off()   # close plot
 
 TR <- function(o)     # select three points randomly in the unit square
 {
     XY <- matrix(runif(6), ncol=2)
     XY <- rbind(XY, XY[1,])   # duplicates top row at bottom
-    x11(width=5,height=5.5)    # keep old plot and open a new plotting window
+    #x11(width=5,height=5.5)    # keep old plot and open a new plotting window
     plot(XY,xlim=0:1,ylim=0:1)
     lines(XY,col=CL(),lwd=3)
     XY
@@ -101,7 +103,7 @@ for (j in 1:50)
     TR() 
   }
 
-graphics.off()   # close all plots altogether
+#graphics.off()   # close all plots altogether
 
 # Could study the area of random triangles, or perimeter,
 # or maximum angles -- look at the latter only
@@ -122,14 +124,15 @@ rnd.mxangl <- function(m)
 }
 
 AG <- rnd.mxangl(10000)
+
 AG[1:40]         # listing only the first 40 angles (rather than all 10000)
 dim(AG) <- c(10000,1)         # regard DS not as a vector, but a column matrix         
 t(apply(180*AG/pi,2,smry))    # express statistics using degrees, not radians
 
-x11()
+#x11()
 hist(180*AG/pi, freq=FALSE, border="darkblue", plot=TRUE)
 # no nice expression for the theoretical density function is known
-graphics.off()   # close plot
+#graphics.off()   # close plot
 
 # the probability that a triangle is obtuse:
 length(AG[AG>pi/2])/10000
