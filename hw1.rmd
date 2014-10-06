@@ -1,0 +1,36 @@
+
+# One Cycle
+# 1,2,3,4,5,6,7,8, 9,10
+# 3,5,7,4,9,6,8,10,2,1
+```{r}
+set.seed(5)
+set <- c(2,1,4,3,6,5,8,7,10,9)
+ind <- 1:11
+print(ind);print(set);
+
+cycle <- 2
+setCopy <- set
+
+for (i in 1:length(set)) {
+         set[i] <- setCopy[(i + length(setCopy) - cycle)%%length(setCopy) + 1]
+          #print((i + 10 - cycle)%%10 + 1)
+}
+
+print(ind); print(set)
+
+
+## count number of 2-cycles
+twoCycles <- function(set){
+     setCopy <- set
+     for (i in 1:length(set)) {
+         set[i] <- setCopy[(i + length(setCopy) - cycle)%%length(setCopy) + 1]
+        }
+     return(set)
+}
+
+twoCycleDist <- replicate(100000, sum((twoCycles(sample(1:10)) - 1:length(sample(1:10))) == FALSE))
+
+hist(twoCycleDist, breaks = 7)
+
+
+```
