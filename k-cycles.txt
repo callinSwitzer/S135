@@ -1,0 +1,71 @@
+*** More Explanation of k-Cycles ***
+
+Consider the following permutation on 8 symbols:
+
+1 4 2 8 5 7 6 3
+
+By writing the position numbers on top of each
+symbol:
+
+1 2 3 4 5 6 7 8
+1 4 2 8 5 7 6 3
+
+we see that the "cycle decomposition" of the
+permutation is:
+
+(1) (2 4 8 3) (5) (6 7)
+
+By this, I mean that 1 & 5 are fixed points
+(same as one-cycles) and (6 7) is a two-cycle
+(since 6 is mapped to 7 & 7 is mapped to 6).
+I hope that it's now clear why (2 4 8 3) is a
+four-cycle.
+
+To count one-cycles of an arbitrary permutation
+X is easy: form the difference vector X - 1:8
+and enumerate the zeros!  
+
+To count two-cycles of an arbitrary permutation
+X is harder: we need to examine the "second-
+generational mapping":
+
+1 -> 1 -> 1
+2 -> 4 -> 8
+3 -> 2 -> 4
+4 -> 8 -> 3
+5 -> 5 -> 5
+6 -> 7 -> 6
+7 -> 6 -> 7
+8 -> 3 -> 2
+
+that is, we look at the "new" permutation
+
+1 8 4 3 5 6 7 2
+
+As before, take the difference with 1:8
+and enumerate the zeros.  Be careful to
+subtract out the one-cycles and also to
+divide by two (to avoid double-counting!)
+
+There is a very quick, beautiful way of
+computing the "new" permutation using R:
+
+> X=c(1,4,2,8,5,7,6,3)
+> X[X]
+[1] 1 8 4 3 5 6 7 2
+
+Please study this carefully.  You will
+understand the square-bracket notation
+much better as a consequence.
+
+
+
+
+
+
+
+
+
+
+
+

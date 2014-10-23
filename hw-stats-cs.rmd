@@ -1,0 +1,69 @@
+---
+title: "hwstat"
+output: pdf_document
+---
+
+Homework Stat  		October 15, 2014
+
+
+1.  Using R, reproduce the SAS analysis in s12.sas (involving candy).
+```{r}
+candy <- read.csv("hwstat/candy.csv")
+
+## print contents
+summary(candy)
+
+## summary of SatFat
+summary(candy$SatFat)
+```
+
+Also do the first problem in hw0.txt (listing companies with more than three products).
+
+1.  **More Candy -- a final SAS exercise**
+
+Look at the Candy SAS dataset.  Suppose that we want to study
+only the subset consisting of companies (brands) that have
+more than two products (names).  Write SAS code that removes
+automatically all companies with two or less products.
+
+
+2.  Using R, reproduce the SAS analysis in s13.sas (involving beer).
+
+
+
+
+3.  Using R, reproduce the SAS analysis in s4.sas (involving e-mail & privacy + more).
+
+
+4.  Using R, reproduce the SAS analysis in s6.sas (involving patient visits over time).
+
+
+5.  Recall the Georgia deathrow dataset, which was featured in our final SAS lecture.
+The code s23.sas listed all variable names (out of 1030) that began/ended as prescribed.
+SAS macros to do this seemed complicated; let's use R character functions instead!  What 
+are all variable names beginning with "VI"?  What are all variable names ending with "5"?
+
+
+6.  What is the expected length of the longest run of consecutive heads in a sequence 
+of n fair coin tosses?  Take n to be as large as feasible.  (Efficient R code matters!)
+
+
+7.  Roll five fair dice.
+Let S be the sum of the numbers on all five dice if no 2s or 5s appear; 
+otherwise S is zero.  Write S on a score sheet.
+Look for any dice showing a 2 or a 5. Remove such dice and place them aside; 
+they are now "dead".
+Roll the remaining "live" dice again, and, as before, compute S and write it on score sheet. 
+Continue to remove any 2s & 5s and roll the remaining dice.
+At the point when all remaining dice are only 2s and 5s, the game is over.  
+Add the scores on the score sheet.  Call this T.
+What is the expected value of T?  Give a histogram of your simulation results.
+
+
+8.  Cars arrive at an intersection with a stoplight (which is either red or green).
+They are all traveling in the same direction (i.e., ignore cross-traffic & oncoming traffic.)
+Assume that the intersection starts out empty.  A red light lasts 30 seconds; likewise for green.
+Assume that, at every second, there is a probability p that a new car will arrive at the light.
+Assume that, if the light is green, then 1 car can leave the intersection every 3 seconds.
+Simulate & plot the traffic build-up at the intersection over a one-hour period.  What is the
+mean number of waiting cars when p=1/8?  When p=1/6?  When p=1/24?

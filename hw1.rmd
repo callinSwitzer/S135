@@ -2,7 +2,27 @@
 # One Cycle
 # 1,2,3,4,5,6,7,8, 9,10
 # 3,5,7,4,9,6,8,10,2,1
-```{r}
+
+A challenging R programming exercise:
+count the number of 2-cycles in an arbitrary n-permutation and
+study its probabilty distribution.
+
+```{r} 
+## this is the right answer
+n <- 10
+
+tcyc <- function(o){
+     x <- sample(n)
+     sum(x[x] == 1:length(x) & x[x] != x) # gives number of two cycles
+}
+
+ntc <- replicate(10000, tcyc())
+hist(ntc)
+
+```
+
+
+```{r, eval = F, echo = F}
 set.seed(5)
 set <- c(2,1,4,3,6,5,8,7,10,9)
 ind <- 1:11

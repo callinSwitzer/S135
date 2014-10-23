@@ -40,7 +40,7 @@ cor(AP)           # correlation matrix (off-diagonal element is what we want)
 
 cor(AP)[2,1]          # theoretical correlation coefficient is unknown
 
-x11()
+###x11()
 plot(AP,pch=".")          # scatterplot (one point per triangle)
 # same as plot(AP[,2]~AP[,1],pch=".")          
 
@@ -67,3 +67,4 @@ curve(h,from=0,to=1/2,add=TRUE,col="green",lwd=2)   # least squares line
 summary(lm(AP[,2]~AP[,1]))$r.squared       # fraction of variance explained by the model
 cor(AP)[2,1]^2                             # same as correlation coefficient squared
 
+max(AP[,2])
