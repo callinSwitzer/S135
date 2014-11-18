@@ -1,0 +1,14 @@
+% latex table generated in R 3.1.1 by xtable 1.7-4 package
+% Wed Oct 29 10:44:38 2014
+\begin{table}[ht]
+\centering
+\caption{Percentage of Total Regional Beer Sales by Season <BR>(based on five years of data)} 
+\begin{tabular}{rrrrr}
+  \hline
+ & Summer & Autumn & Winter & Spring \\ 
+  \hline
+Sales (\$) & 3512.60 & 2516.50 & 2332.30 & 2852.70 \\ 
+  Sales (\%) & 31.32 & 22.44 & 20.80 & 25.44 \\ 
+   \hline
+\end{tabular}
+\end{table}
