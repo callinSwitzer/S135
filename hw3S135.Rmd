@@ -1,0 +1,489 @@
+Homework #3     		October 31, 2014
+
+1.  Consider a standard deck of 52 playing cards and draw 5 cards at
+random.  Write simulations that calculate the probability of:
+     
+a.  one pair (contains two cards of the same rank, plus three other 
+                   unmatched cards)
+```{r}
+deck <- data.frame(num = rep(1:13, 4), 
+                   suit = rep(c("heart", "spade", "club", "diamond"), each = 13))
+Pair <- function(o){
+     h <- sample(deck$num, size = 5, replace = FALSE)
+     sum(table(h) == 2) == 1 # returns T if you have one pair
+}
+
+p <- mean(replicate(10000, Pair()))
+p
+
+```
+                   
+b.  two pairs (contains two cards of the same rank, plus two cards of 
+               another rank that match each other but not the first pair, plus 
+               one unmatched card).
+               
+```{r}
+Pair2 <- function(o){
+     h <- sample(deck$num, size = 5, replace = F)
+     sum(table(h) == 2) == 2 # returns T if you have two pair
+}
+
+p2 <- mean(replicate(10000, Pair2()))
+p2
+
+```
+c.  triple (contains three cards of the same rank, plus two other 
+            unmatched cards)
+            
+```{r}
+triple <- function(o){
+     h <- sample(deck$num, size = 5, replace = F)
+     sum(table(h) == 3) == 1 # returns T if you have a triple
+}
+
+t <- mean(replicate(10000, triple()))
+t
+
+```
+
+
+2.  Devise simulations for your own favorite gambling games involving 
+coins, dice, cards, shotguns, ...
+
+```{r}
+# flush
+flush <- function(o){
+     f <- sample(deck$suit, 5, replace = F)
+     table(f)
+     (sum(table(f) == 5) == 1) 
+}
+
+fl <- mean(replicate(10000, flush()))
+fl
+
+```
+3.  Given two random positive integers less than N, what is the
+probability that no factor exceeding 1 divides both of them? What
+is the limit of this probability as N approaches infinity?
+```{r}
+# found this function on stack exchange
+factors <- function(x) {
+    x <- as.integer(x)
+    div <- seq_len(abs(x)) # gives 1:x
+    factors <- div[x %% div == 0] # remainder = 0
+    factors <- list(factors)
+    return(factors)
+}
+
+getInts <- function(N=100, o){
+     n <- 1:N
+     nums <- sample(N, 2, replace = F)
+     # find all factors of N
+     fac <- sapply(nums, factors)
+     
+     fac <- unlist(fac) # unlist
+     fac <- fac[fac !=1] # remove 1
+     #sum(table(fac) > 1) > 0 # returns true if there are duplicate factors
+     sum(duplicated(fac)) == 0 # returns true if there are no duplicate factors
+}
+
+
+
+N <- 100000
+GI <- function(N){mean(replicate(100000, getInts(N)))}
+#probs <- sapply(N, GI)
+#probs
+# 0.60624
+
+
+```
+
+4.  Suppose a needle of length 1 is thrown at random on a plane 
+marked by parallel lines of distance 1 apart.  What is the 
+probability that the needle will intersect one of the lines?
+
+```{r}
+plotNeedle <- function(x = 1/2, y=1/2, r = 1) {
+     x <- runif(1)
+     y <- runif(1)
+     angles <- seq(0,2*pi,length.out=360)
+     angles <- sample(angles, 1)
+     x2 <- r*cos(angles)+x
+     y2 <- r*sin(angles)+y
+     
+     # I got rid of all the plotting stuff for the simulations
+     #plot(x,y, xlim = c(-1,2), ylim = c(-1,2))
+     #lines(x = c(x, x2),y = c(y,y2))
+     #points(r*cos(angles)+x,r*sin(angles)+y)
+     #abline(h = 1, lty = 5); abline(h = 0, lty = 5)
+     # will be true if the needle crosses the line
+     return(I(r*sin(angles)+y) > 1 | I(r*sin(angles)+y) < 0) 
+}
+
+#plot(runif(1), runif(1), type = "n",xlim = c(-1,2), ylim = c(-1,2) )
+#abline(h = 1, lty = 5); abline(h = 0, lty = 5)
+crosses <- replicate(100000, plotNeedle())
+sum(crosses)/length(crosses)
+
+# theoretical?
+(2 + pi)/(3+2+pi) # = 0.6315 (not sure if this is right)
+
+# answer from simulation: 0.635
+
+
+```
+
+5.  Browse John Maindonald's "Using R for Data Analysis and Graphics - 
+Introduction, Examples and Commentary", which is available at:
+
+http://wwwmaths.anu.edu.au/~johnm/r/
+
+(Download and save the PDF file 'usingR.pdf'.  Datasets are found
+in the '/dsets' subdirectory.)  I considered his book with John Braun
+as a textbook for this course, but it did not discuss R programming
+in enough depth.  Search for interesting data analysis exercises
+and work them out!
+
+
+
+I chose to do the following problem from 6.5: 
+1. Using the data set painters (MASS package), apply principal components analysis to the scores for Composition, Drawing, Colour, and Expression. Examine the loadings on the first three principal components. Plot a scatterplot matrix of the first three principal components, using different colours or symbols to identify the different schools.
+
+```{r, fig.height=5, fig.width=5}
+library(MASS)
+data(painters)
+#?painters
+
+paint1 <- scale(painters[,1:4])
+paintPCA <- princomp(paint1)
+#plot(paintPCA$scores[,1], paintPCA$scores[,2], col = painters$School)
+
+#pairs(paintPCA$scores, col = painters$School)
+pairs(paint1[,1:3], col = painters$School, pch = 20)
+
+biplot(princomp(paint1[,1:4]), cex = 0.5, 
+       col = c(rgb(0,0,0, 0.5), "red"), xlim = c(-0.4, 0.4))
+```
+
+
+I also chose this exercise from CH.8: 
+14. Write an R function that simulates a student guessing at a multiple choice test consisting of 40 questions, where there is chance of 1 in 5 of getting the right answer to each question. Find the mean and variance of the student's answers. Compare with the theoretical values of .2 and .16.
+```{r}
+correctAnswer <- function(o) sample(1:5, size = 1)
+guess <- function(o) sample(1:5, size = 1)
+
+answers <- function(o){
+     return(c(correctAnswer(), guess()))
+}
+
+ff <- function(o){
+     corAndGuess <- replicate(40, answers())
+     dim(corAndGuess) <- c(40, 2)
+     su<-sum(corAndGuess[,1] == corAndGuess[,2])/40
+     var<-var(corAndGuess[,1] == corAndGuess[,2])
+     return(c(sum = su, var = var))
+}
+
+#mean(replicate(1000, ff())[1,]) # very close to 0.2
+#mean(replicate(1000, ff())[2,]) # very close to 0.16
+```
+
+
+6.  Browse Venables & Smith's "An Introduction to R", which is
+available at:
+     
+     http://cran.r-project.org/manuals.html
+
+(Download and save the PDF file 'R-intro.pdf'.)  This is more
+abstract and has no exercises.  I would have liked to find a book 
+halfway between Maindonald (which is easy) and Venables & Smith
+(which is hard).
+
+7.  Likewise, browse Green's "The R Primer"
+
+http://www.stat.washington.edu/cggreen/rprimer/rprimer.html
+
+and look for topics that interest you.  Again, there are no
+exercises.
+
+8.  In class, we examined M/M/1 and M/M/2 in files r7.R and r8.R.  
+Remember that the "system" contains both the queue (waiting room) 
+and service (doctor's office).  Previously we computed statistics 
+and drew plots associated with:  
+     Wq = time in queue per patient, 
+     Ls = number of patients in system. 
+Do the same for:   
+     Ws = time in system per patient, 
+     Lq = number of patients in queue
+in the case of one doctor and the case of two doctors.  
+(Just start with files r7.R & r8.R and edit appropriately.)
+                                                         
+                                                         
+```{r}
+N <- 24*7      # number of hours in a week
+C <- 1         # number of doctors    
+A <- 2         # mean rate of patient arrivals per hour
+B <- 3         # mean rate of patient treatments per hour,
+               #   per busy doctor
+M <- 250       # number of iterations (weeks)
+# Wq           # waiting time in queue per patient
+               #   (excludes service time)
+# Ls           # number of patients in system (both queue and service)
+
+# Ws = Wq + treatment time
+# Lq = Number of patiens in system - number getting treated
+
+emrgncy.week <- function(o)
+  {
+    K <- rpois(1,N*A)      # number of patients in week o
+    P <- matrix(0,K,3) 
+    P[,1] <- sort(runif(K,0,N)) # gives times of arrival
+    P[,3] <- rexp(K,B)     # treatment length is Exp[B]
+    D <- rep(0,C)          # initially all 0s (Is the doctor available?)
+    for (i in 1:K)         # begin small loop
+      {
+        j <- which.min(D) # which doctor is next available
+        P[i,2] <- max(P[i,1],D[j]) #P[,2] is the "treatment begin time"
+        D[j] <- P[i,2] + P[i,3]
+      }                    # end small loop
+    P
+}                          # end definition of emrgncy.week
+
+#emrgncy.week()
+
+waiting.list <- function(o)
+  {
+    P <- emrgncy.week()
+    Wq <- P[,2]-P[,1]    # P[,2]-P[,1] is of indeterminate length K   
+    Ls <- sapply(1:N, function(t) length(P[P[,1]<t & t<P[,2]+P[,3],1]))
+    list(Wq + P[,3],ifelse(Ls < 2, 0, Ls - 2))
+  }
+
+#waiting.list()
+
+X <- sapply(1:M, function(o) waiting.list())
+#X
+Ws <- unlist(X[1,])
+Lq <- unlist(X[2,])
+
+
+# I need to check these
+mean(Ws)
+mean(Lq)
+
+
+
+```
+
+9.  A new museum opens, but tickets must be purchased in advance.
+People buy tickets according to a Poisson process at rate 500 (per day). 
+For each buyer, the separation S between their purchase time
+and their museum visit is Unif[0,4] (in days).  What is the expected
+cumulative number of visitors T days after opening, where T=1, 2, 3, 
+4, 5, 6 or 7?
+
+```{r}
+# this one is probably wrong...
+
+rate <- 500
+
+K <- rpois(7,rate)      # number of tickets bought on day o
+visits <- numeric()                             # when each of those people visit the museum
+i <- 1:length(K)
+ss <- function(i) {
+     K <- rpois(7, rate)
+     sum(K[1:i] * 1/4)   
+}
+ss(1)
+ssV <- Vectorize(ss)
+
+
+stuff <- t(replicate(1000, ssV(i)))
+
+plot(colMeans(stuff), xlab = "day", ylab = "visitors") # this shows cumulative visitors
+cumsum(colMeans(stuff))/2 # not right
+
+```
+
+10.  A company has a large number of machines that tend to break
+down according to a Poisson process at rate 5 (per hour).  A single
+repair person is available.  Due to the nature of the machines,
+it takes the person either 9 minutes or 12 minutes to repair a
+machine.  The 12-minute type of malfunction occurs with probability
+1/3.  What is the expected number of machines down at any given
+time?  Also, what is the probability that more than three machines
+will be down at any given time?
+
+```{r}
+rate <- 5  # 5 breakdowns per hour  == 5/60 breakdowns per minute
+machBreak <- function(o){
+     breaks <- rpois(60, 5/60) # number of breaks per minute for an hour
+     timeFixing <- numeric()
+     machineBroken <- numeric()
+     timeFix <- numeric()
+     for(i in 1:length(breaks)){
+          if(timeFix[1] == 0 & !is.na(timeFix[1])) timeFix <- timeFix[-1]
+          #timeFix
+          #timeFixing[i] 
+          longShort <- rbinom(n = breaks[i], size = 1, prob = (1/3))
+          #longShort
+          fixThisRound <- ifelse(longShort == 0, 9, 12)
+          timeFix <- c(timeFix, fixThisRound)
+          if(!is.na(timeFix[1])) timeFix[1] <- timeFix[1] - 1
+          #timeFix
+          machineBroken[i] <- ifelse(is.na(timeFix[1]), 0 , length(timeFix[timeFix !=0]))
+          #totalFixTime <- sum(timeFix)
+          #print(c(time = timeFix, machinesBroken = machineBroken[i]))
+          #i = i + 1
+     }
+     return(mean(machineBroken))
+}
+
+#meanBrokenMachines <- mean(replicate(10000, machBreak()))
+#meanBrokenMachines # 1.091588
+
+
+# Probability that > 3 machines will be broken down
+machBreakProb <- function(o){
+     breaks <- rpois(60, 5/60) # number of breaks per minute for an hour
+     timeFixing <- numeric()
+     machineBroken <- numeric()
+     timeFix <- numeric()
+     for(i in 1:length(breaks)){
+          if(timeFix[1] == 0 & !is.na(timeFix[1])) timeFix <- timeFix[-1]
+          #timeFix
+          #timeFixing[i] 
+          longShort <- rbinom(n = breaks[i], size = 1, prob = (1/3))
+          #longShort
+          fixThisRound <- ifelse(longShort == 0, 9, 12)
+          timeFix <- c(timeFix, fixThisRound)
+          if(!is.na(timeFix[1])) timeFix[1] <- timeFix[1] - 1
+          #timeFix
+          machineBroken[i] <- ifelse(is.na(timeFix[1]), 0 , length(timeFix[timeFix !=0]))
+          #totalFixTime <- sum(timeFix)
+          #print(c(time = timeFix, machinesBroken = machineBroken[i]))
+          #i = i + 1
+     }
+     return(sum(machineBroken > 3)/length(machineBroken))
+}
+
+#Prob <- mean(replicate(10000, machBreakProb()))
+#Prob # 0.046 is the prob of > three broken machines at any given time
+
+```
+
+THE FOLLOWING FOUR PROBLEMS ARE HARD!
+     
+     11.  Consider the one-dimensional interval [0,x] with x > 1. 
+Imagine it to be a street for which parking is permitted on one
+side.  Cars of unit length are one-by-one parked completely at
+random on the street and obviously no overlap is allowed with
+cars already in place.  What is the mean number, M(x), of 
+cars that can fit?  What is the limit of M(x)/x as x approaches
+infinity?
+
+
+
+```{r}
+X <- 10 # length of parking interval
+plot(1,1,type = "n", xlim = c(0, X), ylim = c(0,0.3))
+
+# park first car
+bump <- function(o) runif(1,0, X-1)
+x1 <- bump()
+car <- c(x1, x1 + 1)
+car <- function(o){
+     x1 <- bump()
+     c(x1, x1 + 1)
+}
+
+car()
+
+lines(x = car(), y = c(0.02, 0.02) + runif(1,min = 0.01, 0.05), col = sample(1:3, 1), lwd = 5)
+
+nsim <- 100
+prk <- matrix(data = 0,nrow = nsim, ncol = 2)
+X <- 5 # length of parking interval
+plot(1,1,type = "n", xlim = c(0, X), ylim = c(0,0.3))
+i = 1
+for(i in 1:nsim){
+     
+     newCar <- car()
+     if(sum(newCar[1] > prk[,1] & newCar[1] < prk[,2]) == 0 &
+             sum(newCar[2] > prk[,1] & newCar[2] < prk[,2]) == 0){
+         prk[i,] <- newCar
+         lines(x = newCar, 
+               y = c(0.02, 0.02) + runif(1,min = 0.01, 0.05), 
+               col = sample(1:3, 1), lwd = 1)
+     }
+     prk
+     i = i + 1
+}
+# find space between each of the cars
+prkO <- prk[prk[,2] != 0, ]
+prkO <- prkO[order(prkO[,1],decreasing = F), ]
+dfDist <- data.frame(c(0, prkO[,1]+1), c(prkO[,1], X))
+max(dfDist[2]- dfDist[1]) > 1 # only keep the ones where this is FALSE
+
+
+# idea
+vec <- sample(x = c(0,1), size = 10000, replace = T, prob = c(0.6, 0.4))
+k <- 1:(10000 -2)
+
+fii <- vec[k]*vec[k+1]*vec[k+2]
+sum(fii == 1)/length(vec)
+
+# park another car
+
+
+
+```
+
+12.  Consider a variation of the above, in which the interval [0,x]
+is replaced by the discrete linear lattice 1, 2, 3, ..., n.
+Each car is a line segment of unit length and covers two lattice
+points when it parks.  No car is permitted to touch points that
+have already been covered.  The random parking process stops when 
+no two adjacent pairs of lattice points are left uncovered.  What 
+is the analogous limiting density as n approaches infinity?
+
+13. MORE COINS
+
+Suppose you want to play a game that has the following rules:
+     
+     A. Each play of the game involves repeatedly flipping three unbiased 
+independent coins. You keep track, for each coin k, the difference d.k
+between the number of heads tossed and the number of tails tossed.
+The game stops when d.1 = 0, or d.2 = 0, or d.3 = 0.
+
+B. If you decide to play the game, you are required to pay $1 for each
+flip of the three coins. You are not allowed to quit during a play of 
+the game.
+
+C. You receive $4 at the end of each play of the game.
+
+Thus you win money if the number of flips required is fewer than 4, but you
+lose money if more than 4 flips are required. What is the expected payoff
+(or loss) when playing this game?
+
+
+14. MORE DICE
+
+Background: opposite sides of a cubic die always sum to 7,
+that is, 1 is opposite 6, 2 is opposite 5, and 3 is opposite 4.
+
+Toss an unbiased die repeatedly, keeping track of three things:
+     
+     A. the difference d.1 between the number of 1s tossed and
+the number of 6s tossed;
+
+B. the difference d.2 between the number of 2s tossed and
+the number of 5s tossed;
+
+C. the difference d.3 between the number of 3s tossed and
+the number of 4s tossed.
+
+What is the probability that, at some point in time, we have
+d.1 = d.2 = d.3 = 0 simultaneously?  What is the median
+duration of the game?
+

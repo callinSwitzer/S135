@@ -1,0 +1,24 @@
+** A few pointers about the IQSS Dataverse Network **
+
+http://thedata.org 
+
+http://dvn.iq.harvard.edu/dvn/
+
+especially Gary King's article 
+"An Introduction to the Dataverse Network as an Infrastructure for Data Sharing," 
+Sociological Methods and Research 32 (2007) 173-199
+http://gking.harvard.edu/files/dvn.pdf
+
+http://www.dlib.org/dlib/january11/crosas/01crosas.html
+
+http://gking.harvard.edu/zelig
+
+http://cran.r-project.org/web/packages/Zelig/index.html
+
+
+
+** Some datasets (collected from various R packages) **
+
+http://vincentarelbundock.github.com/Rdatasets/datasets.html
+
+** Thanks to Robert Kindman for providing this link! **

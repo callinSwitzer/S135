@@ -1,0 +1,55 @@
+Three Implementations of Random Permutation Generation (2 in R, 1 in Julia)
+
+X <- function(m,n)
+{    
+    t(sapply(1:m, function(o) sample(n)))     
+}                                              
+
+X(7,10)
+system.time(X(1000000,10))     # typically ~ 10 secs
+
+##
+
+Y <- function(m,n)
+{
+    M <- matrix(0,nrow=m,ncol=n)       
+    for(j in 1:m) M[j,] <- sample(n)
+    M
+}
+
+Y(7,10)
+system.time(Y(1000000,10))     # typically ~ 10 secs
+
+##
+
+function Z(m::Integer, n::Integer)
+   M = zeros(m,n)
+      for k = 1:m
+        M[k,:] = randperm(n)
+      end
+   M
+end
+
+Z(7,10)
+
+@time Z(1000000,10);           # less than 0.5 sec (remarkable!)
+
+
+# http://julialang.org/
+
+# http://www.stat.wisc.edu/~bates/JuliaForRProgrammers.pdf
+
+# http://www.wired.com/2014/02/julia/
+
+# http://newsoffice.mit.edu/2014/high-performance-computing-programming-ease
+
+# http://julialang.org/blog/2013/09/fast-numeric/
+
+
+# Users of R or Matlab are often advised to vectorize their codes as much as  
+# possible to get performance, because loops are slow in those languages. 
+# In Julia, on the other hand, loops can run as fast as those written in C 
+# and you no longer have to count on vectorization for speed. 
+
+# The "whole object approach" I've emphasized for R doesn't help in Julia!
+

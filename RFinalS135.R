@@ -1,0 +1,123 @@
+### Stat 135 Final Project in R
+# Callin Switzer
+
+#########################################################
+####                     Part 1                      ####
+#    Shiny app to "discover" relationships in animals   #
+#########################################################
+
+# load in data
+foo <- read.table(file = "data/PanTHERIA_1-0_WR05_Aug2008.txt", sep = "\t", header = TRUE)
+bar <- read.table(file = "data/PanTHERIA_1-0_WR93_Aug2008.txt", sep = "\t", header = TRUE)
+colnames(foo) <- colnames(bar)
+foobar <- rbind(foo, bar)
+
+# string manipulation for column names
+stuff <- substr(colnames(foobar), start = 6, nchar(colnames(foobar)) )
+beg <- gsub(pattern = "_",replacement = "", x = substr(stuff, 1,2))
+colnames(foobar) <- paste(beg, substr(stuff, start = 3, stop = length(stuff)), sep = "")
+
+# replace -999 with NA's
+foobar[foobar == -999] <- NA
+
+library(shiny)
+runApp("~/Desktop/S135App", display.mode = "showcase")
+
+# show metabolic rate vs. body mass
+
+# identify outliers
+
+
+
+
+#########################################################
+####                     Part 2                      ####
+# Why can't you use t-tests when comparing variances?
+#########################################################
+
+## Here are some functions for simulations -- see below for the acutal description.
+```{r}
+# Functions
+
+# calculates the mean of a random sample
+mm <- function(pop.Var = 10^2, popMean = 10, nsamples = 10){
+     mean(rnorm(nsamples, popMean, sqrt(pop.Var)))
+}
+
+# returns a histogram of the sampling distribution of the sample mean, after 10,000 simulations
+# plots a normal density line
+samplingDistributionOfTheMean <- function(pop.Var = 10^2, popMean = 10, nsamples = 10){
+     # We now calculate sample mean for 10000 random populations
+     replications <- replicate(10000, mm(pop.Var, popMean, nsamples))
+     hist(replications, freq = F, main = paste("Hist of sample mean when number of samples = ", nsamples))
+     
+     # normal line
+     grid <- seq(min(replications), to = max(replications), by = .01)
+     
+     # theoretical sampling distibution of the mean is, in this case N(0,10^2/10)
+     density = dnorm(grid, mean = popMean, sqrt(pop.Var/nsamples))
+     lines(x = grid, density)
+     legend("topright", legend = "Theoretical Density", lty = 1)   
+}
+
+# calculates the variance for a random sample 
+VARS <- function(nsamp = 7, pop.variance = 100){
+     var(rnorm(nsamp, 010, sqrt(pop.variance)))
+}
+
+# returns a histogram of the sampling distribution of the sample variance
+# plots a normal density line and a chi-squared density line
+samplingDistributionOfTheVariance <- function(pop.variance = 100, popMean = 10, nsamp = 5){
+     # histogram of sampling distribution
+     replications <- replicate(10000, VARS(nsamp, pop.variance)*(nsamp - 1)/pop.variance)
+     hist(replications, freq = F, 
+          main = paste("Hist of variance when number of samples = ", nsamp), 
+          xlab = "scaled variances")
+     
+     # normal line
+     grid <- seq(min(replications), to = max(replications), by = .1)
+     
+     # theoretical sampling distibution of the var is no longer normal
+     density = dnorm(grid, mean(replications),sd(replications))
+     lines(x = grid, density)
+     
+     # the sampling distribution of sample variance is (n-1)*S^2/(population variance) ~ ChiSq(df = n-1)
+     densChi <- dchisq(grid, df = nsamp - 1)
+     lines(x = grid, densChi, col = "red")
+     legend("topright", legend = c("Normal Density", "Chi Squared Density"), lty = c(1,1), col = c("black", "red"))     
+}
+
+
+```
+
+# Sampling Distribution of the sample mean
+
+Say we sample 30 random birds from a population, and their velocities are distributed normally, with mean = 100, and standard deviation = 10 (variance = 10^2)
+
+The sampling distribution is what would happen if we could sample 30 random birds lots of times.  For each sample, we calculate the mean. In the simulation below, I sampled 30 birds and calculated the mean 10000 times. Theoretically, the mean of the sampling distribution will be equal to the population mean, and the variance of the sampling distribution will be equal to the population variance, divided by the number of observations (in this case 30).  Here's what the the distribution of sample means would look like, if we could calculate it 10000 times. The mean of the sampling distribution of the sample mean is approximately normally distributed with mean = 100, and the variance of this population is 10^2 / 30.  This is the basis of t-tests. 
+
+```{r}
+samplingDistributionOfTheMean(pop.Var = 100, popMean = 100, nsamples = 30)
+```
+
+# Sampling distribution of sample variance
+
+Now, suppose we do the same thing, but we calculate the variance for each sample, rather than the mean.  This is what the (scaled) sampling distribution of the sample variance looks like. 
+*note: this distribution is scaled, but the logic still holds*
+
+```{r}
+samplingDistributionOfTheVariance(pop.variance = 100, popMean = 100, nsamp = 30)
+
+```
+
+Above, a normal approximation doesn't fit the data as well as a chi-squared density.  Furthermore, the normall approximation gets really bad as the number of samples decreases.  Below is an instance where we sample only 10 birds and calculate their variances.  The sampling distribution of variance is very skewed.
+```{r}
+samplingDistributionOfTheVariance(pop.variance = 100, popMean = 100, nsamp = 10)
+
+```
+
+This is why t-tests are inappropriate for testing variance....unless your samples get really large (in which case the chi-squared and normal curves are basically the same -- see below for a sample size of 500)
+```{r}
+samplingDistributionOfTheVariance(pop.variance = 100, popMean = 100, nsamp = 500)
+
+```
