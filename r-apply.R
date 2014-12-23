@@ -52,9 +52,7 @@ Y(7)                                             # of all
 
 ## tapply, by and aggregate
 
-cars0 <- read.table(
-"C:/Documents and Settings/sfinch/Desktop/93cars.txt",
-na.strings="*",header=T)
+cars0 <- read.table("93cars.txt", na.strings="*",header=T)
 
 cars <- subset(cars0,select = c(manu,type,price,ctympg,hwympg))
 
@@ -157,14 +155,16 @@ outer(-2:2, -2:2, B)
 
 ## writing HTML
 
-install.packages("R2HTML")
+#install.packages("R2HTML")
 library(R2HTML)
+
+## This is a very handy way to output a table to word!!
 
 S <- summary(cars)
 
 HTML(as.title("Summary of Cars Data"),
-     file="C:/Documents and Settings/sfinch/Desktop/cars.html")
-HTML(S,"C:/Documents and Settings/sfinch/Desktop/cars.html",
+     file="cars.html")
+HTML(S,"cars.html",
      innerBorder=1)
 
 detach(cars)
@@ -175,7 +175,7 @@ detach(cars)
 # Error in parse(text = cmd) : contextstack overflow
 # Often OK for N=200, but not for N=300
 
-source("C:/Documents and Settings/sfinch/Desktop/remy.R")   # include as subroutine
+source("remy.R")   # include as subroutine
 
 N <- 100              # number of inner vertices
 

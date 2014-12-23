@@ -21,7 +21,7 @@ colnames(foobar) <- paste(beg, substr(stuff, start = 3, stop = length(stuff)), s
 foobar[foobar == -999] <- NA
 
 library(shiny)
-runApp("~/Desktop/S135App", display.mode = "showcase")
+runApp("~/Desktop/S135App3", display.mode = "showcase")
 
 # show metabolic rate vs. body mass
 
